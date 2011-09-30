@@ -1,5 +1,12 @@
+static = require("node-static")
+
+file = new(static.Server)('..')
+
 httpServer = require('http').createServer(
   (req,response) ->
+    req.addListener('end', () ->
+      file.serve(req, response)
+    )
 )
 
 httpServer.listen(8080)
@@ -51,8 +58,6 @@ everyone.now.click = (pos) ->
 
   bVy = dy/f
   bVx = dx/f
-  #bVx = 3
-  #bVy = 3
 
   bulletData = new bullet_module.BulletData(bVx, bVy, player.x+3*bVx, player.y+3*bVy)
   bullet = new bullet_module.Bullet(bulletData)
@@ -62,7 +67,6 @@ everyone.now.click = (pos) ->
   bullets.push(bullet)
 
 tick = () ->
-  #console.log "tick"
   for o in objects
     o.tick()
   `for(p_i in players){`
@@ -75,8 +79,9 @@ tick = () ->
     p.playerData.vY = 0
   for bullet in bullets
     if bullet.hasCollidedWithPlayer(p)
-      p.playerData.x = -40000000
-      p.playerData.y = -40000000
+      delete players[p_i]
+      p.playerData.x = -4000
+      p.playerData.y = -4000
   `}`
 
   #console.log objects

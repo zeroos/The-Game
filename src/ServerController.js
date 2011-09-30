@@ -1,5 +1,11 @@
-var bullet_module, bullets, everyone, httpServer, nowjs, objects, objectsData, player_module, players, tick;
-httpServer = require('http').createServer(function(req, response) {});
+var bullet_module, bullets, everyone, file, httpServer, nowjs, objects, objectsData, player_module, players, static, tick;
+static = require("node-static");
+file = new static.Server('..');
+httpServer = require('http').createServer(function(req, response) {
+  return req.addListener('end', function() {
+    return file.serve(req, response);
+  });
+});
 httpServer.listen(8080);
 nowjs = require('now');
 everyone = nowjs.initialize(httpServer);
@@ -71,8 +77,9 @@ tick = function() {
   for (_j = 0, _len2 = bullets.length; _j < _len2; _j++) {
     bullet = bullets[_j];
     if (bullet.hasCollidedWithPlayer(p)) {
-      p.playerData.x = -40000000;
-      p.playerData.y = -40000000;
+      delete players[p_i];
+      p.playerData.x = -4000;
+      p.playerData.y = -4000;
     }
   }
   };
