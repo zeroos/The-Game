@@ -9,7 +9,7 @@ httpServer = require('http').createServer(
     )
 )
 
-httpServer.listen(80)
+httpServer.listen(8080)
 
 
 nowjs = require('now')
