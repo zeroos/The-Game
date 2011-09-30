@@ -13,7 +13,7 @@ player_module = require('./objects/Player.js');
 bullet_module = require('./objects/Bullet.js');
 objects = [];
 objectsData = [];
-players = [];
+players = {};
 bullets = [];
 everyone.now.join = function(nick) {
   var player, playerData;
@@ -62,31 +62,33 @@ everyone.now.click = function(pos) {
   return bullets.push(bullet);
 };
 tick = function() {
-  var bullet, o, p, _i, _j, _len, _len2;
+  var bullet, id, o, p, _i, _len, _results;
   for (_i = 0, _len = objects.length; _i < _len; _i++) {
     o = objects[_i];
     o.tick();
   }
-  for(p_i in players){;
-  p = players[p_i];
-  if (p.playerData.x - p.playerData.r < 0 || p.playerData.x + p.playerData.r > 200) {
-    p.playerData.x += -p.playerData.vX;
-    p.playerData.vX = 0;
-  }
-  if (p.playerData.y - p.playerData.r < 0 || p.playerData.y + p.playerData.r > 400) {
-    p.playerData.y += -p.playerData.vY;
-    p.playerData.vY = 0;
-  }
-  console.log(players);
-  console.log(p_i);
-  for (_j = 0, _len2 = bullets.length; _j < _len2; _j++) {
-    bullet = bullets[_j];
-    if (bullet.hasCollidedWithPlayer(p)) {
-      p.playerData.x = -4000;
-      p.playerData.y = -4000;
+  _results = [];
+  for (id in players) {
+    p = players[id];
+    if (p.playerData.x - p.playerData.r < 0 || p.playerData.x + p.playerData.r > 200) {
+      p.playerData.x += -p.playerData.vX;
+      p.playerData.vX = 0;
     }
+    if (p.playerData.y - p.playerData.r < 0 || p.playerData.y + p.playerData.r > 400) {
+      p.playerData.y += -p.playerData.vY;
+      p.playerData.vY = 0;
+    }
+    _results.push((function() {
+      var _j, _len2, _results2;
+      _results2 = [];
+      for (_j = 0, _len2 = bullets.length; _j < _len2; _j++) {
+        bullet = bullets[_j];
+        _results2.push(bullet.hasCollidedWithPlayer(p) ? (p.playerData.x = -4000, p.playerData.y = -4000) : void 0);
+      }
+      return _results2;
+    })());
   }
-  return };
+  return _results;
 };
 sync = function() {
   var _base;

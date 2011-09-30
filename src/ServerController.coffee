@@ -19,7 +19,7 @@ bullet_module = require('./objects/Bullet.js')
 
 objects = []
 objectsData = []
-players = []
+players = {}
 bullets = []
 
 everyone.now.join = (nick) ->
@@ -71,21 +71,19 @@ everyone.now.click = (pos) ->
 tick = () ->
   for o in objects
     o.tick()
-  `for(p_i in players){`
-  p = players[p_i]
-  if p.playerData.x-p.playerData.r < 0 or p.playerData.x+p.playerData.r > 200
-    p.playerData.x += -p.playerData.vX
-    p.playerData.vX = 0
-  if p.playerData.y-p.playerData.r < 0 or p.playerData.y+p.playerData.r > 400
-    p.playerData.y += -p.playerData.vY
-    p.playerData.vY = 0
-  console.log players
-  console.log p_i
-  for bullet in bullets
-    if bullet.hasCollidedWithPlayer(p)
-      p.playerData.x = -4000
-      p.playerData.y = -4000
-  `}`
+  for id,p of players
+    if p.playerData.x-p.playerData.r < 0 or p.playerData.x+p.playerData.r > 200
+      p.playerData.x += -p.playerData.vX
+      p.playerData.vX = 0
+    if p.playerData.y-p.playerData.r < 0 or p.playerData.y+p.playerData.r > 400
+      p.playerData.y += -p.playerData.vY
+      p.playerData.vY = 0
+    for bullet in bullets
+      if bullet.hasCollidedWithPlayer(p)
+        p.playerData.x = -4000
+        p.playerData.y = -4000
+
+
 
   #console.log objects
 sync = () ->
