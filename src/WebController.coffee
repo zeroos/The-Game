@@ -49,7 +49,7 @@ init = ->
   objects = []
   objectsData = []
 
-  player = null
+  player = {}
 #  player = new Player
 #  playerBmp = new PlayerBitmap(player)
 
@@ -70,23 +70,41 @@ init = ->
   #setup player keyboard control
   document.onkeydown = (event) =>
     if event.keyCode == 38 #up
-      now.goingUp(true)
+      console.log 'up'
+      if(!player.goingUp)
+        console.log 'not'
+        now.goingUp(true)
+        player.goingUp = true
     else if event.keyCode == 40 #down
-      now.goingDown(true)
+      if(!player.goingDown)
+        now.goingDown(true)
+        player.goingDown = true
     else if event.keyCode == 37 #left
-      now.goingLeft(true)
+      if(!player.goingLeft)
+        now.goingLeft(true)
+        player.goingLeft = true
     else if event.keyCode == 39 #right
-      now.goingRight(true)
+      if(!player.goingRight)
+        now.goingRight(true)
+        player.goingRight = true
 
   document.onkeyup = (event) =>
     if event.keyCode == 38 #up
-      now.goingUp(false)
+      if(player.goingUp)
+        now.goingUp(false)
+        player.goingUp = false
     else if event.keyCode == 40 #down
-      now.goingDown(false)
+      if(player.goingDown)
+        now.goingDown(false)
+        player.goingDown = false
     else if event.keyCode == 37 #left
-      now.goingLeft(false)
+      if(player.goingLeft)
+        now.goingLeft(false)
+        player.goingLeft = false
     else if event.keyCode == 39 #right
-      now.goingRight(false)
+      if(player.goingRight)
+        now.goingRight(false)
+        player.goingRight = false
   
 
   stage.addChild(new Bitmap(newCanvas))
@@ -111,7 +129,7 @@ init = ->
       console.log "sync data"
       objectsData = data
       syncObjects()
-    now.join()
+    now.join("Player")
   )
 
   syncObjects = () ->

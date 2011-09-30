@@ -1,6 +1,6 @@
 static = require("node-static")
 
-file = new(static.Server)('..')
+file = new(static.Server)('.')
 
 httpServer = require('http').createServer(
   (req,response) ->
@@ -9,7 +9,7 @@ httpServer = require('http').createServer(
     )
 )
 
-httpServer.listen(49770)
+httpServer.listen(80)
 
 
 nowjs = require('now')
@@ -22,8 +22,10 @@ objectsData = []
 players = []
 bullets = []
 
-everyone.now.join = () ->
-  console.log "Player " + this.user.clientId + " joined"
+everyone.now.join = (nick) ->
+  if !nick? or typeof this.now.sync != "function"
+    return
+  console.log "Player " + nick + " (" + this.user.clientId + ") joined"
   playerData = new player_module.PlayerData
   player = new player_module.Player(playerData)
   players[this.user.clientId] = player
@@ -77,14 +79,17 @@ tick = () ->
   if p.playerData.y-p.playerData.r < 0 or p.playerData.y+p.playerData.r > 400
     p.playerData.y += -p.playerData.vY
     p.playerData.vY = 0
+  console.log players
+  console.log p_i
   for bullet in bullets
     if bullet.hasCollidedWithPlayer(p)
-      delete players[p_i]
       p.playerData.x = -4000
       p.playerData.y = -4000
   `}`
 
   #console.log objects
+sync = () ->
   everyone.now.sync?(objectsData)
 
-setInterval(tick, 10)
+setInterval(tick, 20)
+setInterval(sync, 100)

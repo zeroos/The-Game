@@ -40,7 +40,7 @@ init = function() {
   stage = new Stage(canvas);
   objects = [];
   objectsData = [];
-  player = null;
+  player = {};
   stage.mouseEventsEnabled = true;
   stage.onPress = __bind(function(mouseEvent) {
     var pos;
@@ -49,24 +49,50 @@ init = function() {
   }, this);
   document.onkeydown = __bind(function(event) {
     if (event.keyCode === 38) {
-      return now.goingUp(true);
+      console.log('up');
+      if (!player.goingUp) {
+        console.log('not');
+        now.goingUp(true);
+        return player.goingUp = true;
+      }
     } else if (event.keyCode === 40) {
-      return now.goingDown(true);
+      if (!player.goingDown) {
+        now.goingDown(true);
+        return player.goingDown = true;
+      }
     } else if (event.keyCode === 37) {
-      return now.goingLeft(true);
+      if (!player.goingLeft) {
+        now.goingLeft(true);
+        return player.goingLeft = true;
+      }
     } else if (event.keyCode === 39) {
-      return now.goingRight(true);
+      if (!player.goingRight) {
+        now.goingRight(true);
+        return player.goingRight = true;
+      }
     }
   }, this);
   document.onkeyup = __bind(function(event) {
     if (event.keyCode === 38) {
-      return now.goingUp(false);
+      if (player.goingUp) {
+        now.goingUp(false);
+        return player.goingUp = false;
+      }
     } else if (event.keyCode === 40) {
-      return now.goingDown(false);
+      if (player.goingDown) {
+        now.goingDown(false);
+        return player.goingDown = false;
+      }
     } else if (event.keyCode === 37) {
-      return now.goingLeft(false);
+      if (player.goingLeft) {
+        now.goingLeft(false);
+        return player.goingLeft = false;
+      }
     } else if (event.keyCode === 39) {
-      return now.goingRight(false);
+      if (player.goingRight) {
+        now.goingRight(false);
+        return player.goingRight = false;
+      }
     }
   }, this);
   stage.addChild(new Bitmap(newCanvas));
@@ -87,7 +113,7 @@ init = function() {
       objectsData = data;
       return syncObjects();
     };
-    return now.join();
+    return now.join("Player");
   });
   syncObjects = function() {
     var o, _i, _len, _results;

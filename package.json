@@ -1,0 +1,8 @@
+{
+    "name": "The Game",
+    "version": "0.0.1",
+    "dependencies": {
+        "now": "0.7",
+        "node-static": "0.5.9"
+    }
+}

@@ -1,12 +1,12 @@
-var bullet_module, bullets, everyone, file, httpServer, nowjs, objects, objectsData, player_module, players, static, tick;
+var bullet_module, bullets, everyone, file, httpServer, nowjs, objects, objectsData, player_module, players, static, sync, tick;
 static = require("node-static");
-file = new static.Server('..');
+file = new static.Server('.');
 httpServer = require('http').createServer(function(req, response) {
   return req.addListener('end', function() {
     return file.serve(req, response);
   });
 });
-httpServer.listen(49770);
+httpServer.listen(80);
 nowjs = require('now');
 everyone = nowjs.initialize(httpServer);
 player_module = require('./objects/Player.js');
@@ -15,9 +15,12 @@ objects = [];
 objectsData = [];
 players = [];
 bullets = [];
-everyone.now.join = function() {
+everyone.now.join = function(nick) {
   var player, playerData;
-  console.log("Player " + this.user.clientId + " joined");
+  if (!(nick != null) || typeof this.now.sync !== "function") {
+    return;
+  }
+  console.log("Player " + nick + " (" + this.user.clientId + ") joined");
   playerData = new player_module.PlayerData;
   player = new player_module.Player(playerData);
   players[this.user.clientId] = player;
@@ -59,7 +62,7 @@ everyone.now.click = function(pos) {
   return bullets.push(bullet);
 };
 tick = function() {
-  var bullet, o, p, _base, _i, _j, _len, _len2;
+  var bullet, o, p, _i, _j, _len, _len2;
   for (_i = 0, _len = objects.length; _i < _len; _i++) {
     o = objects[_i];
     o.tick();
@@ -74,15 +77,20 @@ tick = function() {
     p.playerData.y += -p.playerData.vY;
     p.playerData.vY = 0;
   }
+  console.log(players);
+  console.log(p_i);
   for (_j = 0, _len2 = bullets.length; _j < _len2; _j++) {
     bullet = bullets[_j];
     if (bullet.hasCollidedWithPlayer(p)) {
-      delete players[p_i];
       p.playerData.x = -4000;
       p.playerData.y = -4000;
     }
   }
-  };
+  return };
+};
+sync = function() {
+  var _base;
   return typeof (_base = everyone.now).sync === "function" ? _base.sync(objectsData) : void 0;
 };
-setInterval(tick, 10);
+setInterval(tick, 20);
+setInterval(sync, 100);
