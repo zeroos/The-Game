@@ -31,9 +31,10 @@ imageLoader.load = function(name, file) {
   };
 };
 init = function() {
-  var body, canvas, ctx, newCanvas, objects, objectsData, offscreen, player, rebuildStage, stage, syncObjects;
+  var body, canvas, ctx, livesCounter, newCanvas, objects, objectsData, offscreen, player, rebuildStage, stage, syncObjects;
   body = document.body;
   canvas = document.createElement('canvas');
+  livesCounter = document.getElementById('livesCounter');
   canvas.width = document.documentElement.clientWidth;
   canvas.height = document.documentElement.clientHeight;
   ctx = canvas.getContext('2d');
@@ -113,12 +114,16 @@ init = function() {
     }
     return stage.update();
   };
+  livesCounter.innerHTML = "Connecting...";
   body.appendChild(canvas);
+  body.appendChild(livesCounter);
   now.ready(function() {
     now.sync = function(data) {
-      console.log("sync data");
       objectsData = data;
       return syncObjects();
+    };
+    now.setLives = function(lives) {
+      return livesCounter.innerHTML = lives;
     };
     return now.join("Player");
   });
@@ -221,11 +226,16 @@ PlayerBitmap = (function() {
   function PlayerBitmap(player) {
     this.player = player;
     this.initialize(new SpriteSheet(img['object'], 32, 24, {
-      static: [0, 0]
+      static0: [0, 0],
+      static1: [1, 1],
+      static2: [2, 2],
+      static3: [3, 3],
+      static4: [4, 4]
     }));
     this.regX = this.spriteSheet.frameWidth / 2 | 0;
     this.regY = 3 * this.spriteSheet.frameHeight / 4 | 0;
     this.shadow = new Shadow("#333", 1, 0, 0);
+    this.gotoAndStop("static1");
     this.name = "player";
     this.vX = 0;
     this.vY = 0;
@@ -237,7 +247,8 @@ PlayerBitmap = (function() {
     var pos;
     pos = window.mapCoordsToStage(this.player.playerData.x, this.player.playerData.y);
     this.x = pos.x;
-    return this.y = pos.y;
+    this.y = pos.y;
+    return this.gotoAndStop("static" + this.player.playerData.color);
   };
   return PlayerBitmap;
 })();
@@ -266,6 +277,8 @@ BulletBitmap = (function() {
 Player = (function() {
   function Player(playerData) {
     this.playerData = playerData;
+    this.moveToRandomPlace();
+    this.color = 1;
   }
   Player.prototype.setObjectData = function(playerData) {
     this.playerData = playerData;
@@ -281,6 +294,10 @@ Player = (function() {
   };
   Player.prototype.goingRight = function(isGoingRight) {
     this.isGoingRight = isGoingRight;
+  };
+  Player.prototype.moveToRandomPlace = function() {
+    this.playerData.x = Math.floor(Math.random() * ((typeof global !== "undefined" && global !== null ? global.mapWidth : void 0) - 100)) + 50;
+    return this.playerData.y = Math.floor(Math.random() * ((typeof global !== "undefined" && global !== null ? global.mapHeight : void 0) - 100)) + 50;
   };
   Player.prototype.tick = function() {
     if (this.isGoingUp && !this.isGoingDown) {
@@ -310,6 +327,7 @@ PlayerData = (function() {
     this.y = y != null ? y : 50;
     this.type = 1;
     this.r = 6;
+    this.lives = 10;
   }
   return PlayerData;
 })();
@@ -325,6 +343,9 @@ Bullet = (function() {
     this.bulletData = bulletData;
   };
   Bullet.prototype.tick = function() {
+    if (this.bulletData.x < -400 || this.bulletData.y < -400) {
+      return;
+    }
     this.bulletData.x += this.bulletData.vX;
     return this.bulletData.y += this.bulletData.vY;
   };
@@ -334,7 +355,6 @@ Bullet = (function() {
     dy = player.playerData.y - this.bulletData.y;
     r = player.playerData.r - this.bulletData.r;
     if (dx * dx + dy * dy < r * r) {
-      console.log("collided");
       return true;
     }
     return false;

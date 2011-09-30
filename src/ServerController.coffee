@@ -17,20 +17,30 @@ everyone = nowjs.initialize(httpServer)
 player_module = require('./objects/Player.js')
 bullet_module = require('./objects/Bullet.js')
 
+
+global.mapWidth = 200 #very dirty (but fast) solution
+global.mapHeight = 400 #should be changed asap
+
 objects = []
 objectsData = []
 players = {}
 bullets = []
-
+nowjs.on("disconnect", () ->
+  players[this.user.clientId].playerData.x = -4000
+  players[this.user.clientId].playerData.y = -4000
+)
 everyone.now.join = (nick) ->
   if !nick? or typeof this.now.sync != "function"
     return
   console.log "Player " + nick + " (" + this.user.clientId + ") joined"
   playerData = new player_module.PlayerData
+  playerData.color = Math.floor(Math.random()*4)
   player = new player_module.Player(playerData)
   players[this.user.clientId] = player
+  player.now = this.now
   objects.push(player)
   objectsData.push(playerData)
+  this.now.setLives(playerData.lives)
 #  this.now.addPlayer(playerData)
   this.now.sync(objectsData)
 
@@ -68,20 +78,27 @@ everyone.now.click = (pos) ->
   this.now.sync(objectsData)
   bullets.push(bullet)
 
+
 tick = () ->
   for o in objects
     o.tick()
   for id,p of players
-    if p.playerData.x-p.playerData.r < 0 or p.playerData.x+p.playerData.r > 200
+    if p.playerData.x-p.playerData.r < 0 or p.playerData.x+p.playerData.r > global.mapWidth
       p.playerData.x += -p.playerData.vX
       p.playerData.vX = 0
-    if p.playerData.y-p.playerData.r < 0 or p.playerData.y+p.playerData.r > 400
+    if p.playerData.y-p.playerData.r < 0 or p.playerData.y+p.playerData.r > global.mapHeight
       p.playerData.y += -p.playerData.vY
       p.playerData.vY = 0
     for bullet in bullets
       if bullet.hasCollidedWithPlayer(p)
-        p.playerData.x = -4000
-        p.playerData.y = -4000
+        if p.playerData.lives > 0
+          p.playerData.lives -= 1
+          p.moveToRandomPlace()
+          p.now.setLives(p.playerData.lives)
+        else
+          p.playerData.x = -4000
+          p.playerData.y = -4000
+          p.now.setLives("GAME OVER")
 
 
 
@@ -90,4 +107,6 @@ sync = () ->
   everyone.now.sync?(objectsData)
 
 setInterval(tick, 20)
-setInterval(sync, 100)
+setInterval(sync, 80)
+
+

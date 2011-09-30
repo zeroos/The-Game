@@ -1,3 +1,4 @@
 * {margin: 0; padding: 0; overflow: hidden}
 #offscreen {display: none}
 canvas {background-color: #000}
+#livesCounter {color: #fff; font-size: 3em; font-family: sans-serif; font-weight: bold; position:absolute; top: 10px; left: 10px; z-index: 10}

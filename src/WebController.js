@@ -24,9 +24,10 @@ imageLoader.load = function(name, file) {
   };
 };
 init = function() {
-  var body, canvas, ctx, newCanvas, objects, objectsData, offscreen, player, rebuildStage, stage, syncObjects;
+  var body, canvas, ctx, livesCounter, newCanvas, objects, objectsData, offscreen, player, rebuildStage, stage, syncObjects;
   body = document.body;
   canvas = document.createElement('canvas');
+  livesCounter = document.getElementById('livesCounter');
   canvas.width = document.documentElement.clientWidth;
   canvas.height = document.documentElement.clientHeight;
   ctx = canvas.getContext('2d');
@@ -106,12 +107,16 @@ init = function() {
     }
     return stage.update();
   };
+  livesCounter.innerHTML = "Connecting...";
   body.appendChild(canvas);
+  body.appendChild(livesCounter);
   now.ready(function() {
     now.sync = function(data) {
-      console.log("sync data");
       objectsData = data;
       return syncObjects();
+    };
+    now.setLives = function(lives) {
+      return livesCounter.innerHTML = lives;
     };
     return now.join("Player");
   });

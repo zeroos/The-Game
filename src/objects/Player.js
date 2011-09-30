@@ -2,6 +2,8 @@ var Player, PlayerData;
 Player = (function() {
   function Player(playerData) {
     this.playerData = playerData;
+    this.moveToRandomPlace();
+    this.color = 1;
   }
   Player.prototype.setObjectData = function(playerData) {
     this.playerData = playerData;
@@ -17,6 +19,10 @@ Player = (function() {
   };
   Player.prototype.goingRight = function(isGoingRight) {
     this.isGoingRight = isGoingRight;
+  };
+  Player.prototype.moveToRandomPlace = function() {
+    this.playerData.x = Math.floor(Math.random() * ((typeof global !== "undefined" && global !== null ? global.mapWidth : void 0) - 100)) + 50;
+    return this.playerData.y = Math.floor(Math.random() * ((typeof global !== "undefined" && global !== null ? global.mapHeight : void 0) - 100)) + 50;
   };
   Player.prototype.tick = function() {
     if (this.isGoingUp && !this.isGoingDown) {
@@ -46,6 +52,7 @@ PlayerData = (function() {
     this.y = y != null ? y : 50;
     this.type = 1;
     this.r = 6;
+    this.lives = 10;
   }
   return PlayerData;
 })();

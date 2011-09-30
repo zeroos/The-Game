@@ -11,10 +11,16 @@ nowjs = require('now');
 everyone = nowjs.initialize(httpServer);
 player_module = require('./objects/Player.js');
 bullet_module = require('./objects/Bullet.js');
+global.mapWidth = 200;
+global.mapHeight = 400;
 objects = [];
 objectsData = [];
 players = {};
 bullets = [];
+nowjs.on("disconnect", function() {
+  players[this.user.clientId].playerData.x = -4000;
+  return players[this.user.clientId].playerData.y = -4000;
+});
 everyone.now.join = function(nick) {
   var player, playerData;
   if (!(nick != null) || typeof this.now.sync !== "function") {
@@ -22,10 +28,13 @@ everyone.now.join = function(nick) {
   }
   console.log("Player " + nick + " (" + this.user.clientId + ") joined");
   playerData = new player_module.PlayerData;
+  playerData.color = Math.floor(Math.random() * 4);
   player = new player_module.Player(playerData);
   players[this.user.clientId] = player;
+  player.now = this.now;
   objects.push(player);
   objectsData.push(playerData);
+  this.now.setLives(playerData.lives);
   return this.now.sync(objectsData);
 };
 everyone.now.goingUp = function(state) {
@@ -70,11 +79,11 @@ tick = function() {
   _results = [];
   for (id in players) {
     p = players[id];
-    if (p.playerData.x - p.playerData.r < 0 || p.playerData.x + p.playerData.r > 200) {
+    if (p.playerData.x - p.playerData.r < 0 || p.playerData.x + p.playerData.r > global.mapWidth) {
       p.playerData.x += -p.playerData.vX;
       p.playerData.vX = 0;
     }
-    if (p.playerData.y - p.playerData.r < 0 || p.playerData.y + p.playerData.r > 400) {
+    if (p.playerData.y - p.playerData.r < 0 || p.playerData.y + p.playerData.r > global.mapHeight) {
       p.playerData.y += -p.playerData.vY;
       p.playerData.vY = 0;
     }
@@ -83,7 +92,7 @@ tick = function() {
       _results2 = [];
       for (_j = 0, _len2 = bullets.length; _j < _len2; _j++) {
         bullet = bullets[_j];
-        _results2.push(bullet.hasCollidedWithPlayer(p) ? (p.playerData.x = -4000, p.playerData.y = -4000) : void 0);
+        _results2.push(bullet.hasCollidedWithPlayer(p) ? p.playerData.lives > 0 ? (p.playerData.lives -= 1, p.moveToRandomPlace(), p.now.setLives(p.playerData.lives)) : (p.playerData.x = -4000, p.playerData.y = -4000, p.now.setLives("GAME OVER")) : void 0);
       }
       return _results2;
     })());
@@ -95,4 +104,4 @@ sync = function() {
   return typeof (_base = everyone.now).sync === "function" ? _base.sync(objectsData) : void 0;
 };
 setInterval(tick, 20);
-setInterval(sync, 100);
+setInterval(sync, 80);

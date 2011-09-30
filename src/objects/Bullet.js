@@ -7,6 +7,9 @@ Bullet = (function() {
     this.bulletData = bulletData;
   };
   Bullet.prototype.tick = function() {
+    if (this.bulletData.x < -400 || this.bulletData.y < -400) {
+      return;
+    }
     this.bulletData.x += this.bulletData.vX;
     return this.bulletData.y += this.bulletData.vY;
   };
@@ -16,7 +19,6 @@ Bullet = (function() {
     dy = player.playerData.y - this.bulletData.y;
     r = player.playerData.r - this.bulletData.r;
     if (dx * dx + dy * dy < r * r) {
-      console.log("collided");
       return true;
     }
     return false;

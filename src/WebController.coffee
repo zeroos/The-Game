@@ -30,6 +30,8 @@ imageLoader.load = (name, file) ->
 init = ->
   body = document.body
   canvas = document.createElement('canvas')
+
+  livesCounter = document.getElementById('livesCounter')
   #canvas.setAttribute('width', '100%')
   #canvas.setAttribute('height', '100%')
   canvas.width = document.documentElement.clientWidth
@@ -121,14 +123,17 @@ init = ->
       o.tick()
 
     stage.update()
-    
+  
+  livesCounter.innerHTML = "Connecting..."
   body.appendChild(canvas)
+  body.appendChild(livesCounter)
 
   now.ready(() ->
     now.sync = (data) ->
-      console.log "sync data"
       objectsData = data
       syncObjects()
+    now.setLives = (lives) ->
+      livesCounter.innerHTML =  lives
     now.join("Player")
   )
 

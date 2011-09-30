@@ -2,6 +2,8 @@ class Bullet
   constructor: (@bulletData) ->
   setObjectData: (@bulletData) ->
   tick: ->
+    if(@bulletData.x < -400 or @bulletData.y < -400)
+      return
     @bulletData.x += @bulletData.vX
     @bulletData.y += @bulletData.vY
   hasCollidedWithPlayer: (player) ->
@@ -10,7 +12,6 @@ class Bullet
     r = player.playerData.r - @bulletData.r
 
     if dx*dx+dy*dy < r*r
-      console.log "collided"
       return true
     return false
 

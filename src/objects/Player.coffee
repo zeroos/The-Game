@@ -1,5 +1,7 @@
 class Player
   constructor: (@playerData) ->
+    @moveToRandomPlace()
+    @color = 1
 
   setObjectData: (@playerData) ->
 
@@ -7,6 +9,11 @@ class Player
   goingDown: (@isGoingDown) ->
   goingLeft: (@isGoingLeft) ->
   goingRight: (@isGoingRight) ->
+
+  moveToRandomPlace: () ->
+    @playerData.x = Math.floor(Math.random() * (global?.mapWidth-100))+50
+    @playerData.y = Math.floor(Math.random() * (global?.mapHeight-100))+50
+
 
   tick: ->
     if @isGoingUp and not @isGoingDown
@@ -30,6 +37,7 @@ class PlayerData
   constructor: (@vX = 0, @vY = 0, @x = 50, @y = 50) ->
     @type=1
     @r=6
+    @lives = 10
 
 
 if exports?
