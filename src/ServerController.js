@@ -6,7 +6,7 @@ httpServer = require('http').createServer(function(req, response) {
     return file.serve(req, response);
   });
 });
-httpServer.listen(8080);
+httpServer.listen(49770);
 nowjs = require('now');
 everyone = nowjs.initialize(httpServer);
 player_module = require('./objects/Player.js');
